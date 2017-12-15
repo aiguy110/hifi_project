@@ -8,6 +8,7 @@ port = input('Which serial port would you like to connect to? (/dev/ttyACM0)\n>'
 port = '/dev/ttyACM0'
 ser = serial.Serial(port)
 
+display_bac = 0
 bac_graph_points = [0]
 temp_vals = [0]
 times = [0]
@@ -36,6 +37,7 @@ print(f'Grabbing reference reading in \n{timer}')
 def run(data):
     global tic, timer, start_time
     global V_o
+    global display_bac
     global bac_log_short, short_log_length
     global yellow_thress, red_thress
 
@@ -84,7 +86,7 @@ def run(data):
             temp_vals.append(int(val))
 
     except Exception as e:
-        print(e)
+        #print(e)
         pass
 
     # Forget old data
@@ -94,6 +96,7 @@ def run(data):
 
     # Plotting stuff
     line.set_data(times, bac_graph_points)
+    plt.title(f'BAC (%): {display_bac:.{4}f}')
     xmin, xmax = ax.get_xlim()
     #plt.plot([xmin, xmax], [yellow_thress, yellow_thress], 'y--')
     #plt.plot([xmin, xmax], [red_thress, red_thress], 'r--')
