@@ -11,7 +11,7 @@ ser = serial.Serial(port)
 bac_graph_points = [0]
 temp_vals = [0]
 times = [0]
-look_back_secs = 10
+look_back_secs = 20
 
 bac_log_short = []
 short_log_length = 200
@@ -21,10 +21,11 @@ bac_per_ppm = 0.0003404 * 2
 V_source = 5
 V_o = None
 
-yellow_thress = 0.06
+yellow_thress = 0.04
 red_thress = 0.08
 
 fig, ax = plt.subplots()
+ax.set_ylim(0, 0.2)
 line, = ax.plot([], [], lw=2)
 ax.grid()
 
@@ -39,8 +40,9 @@ def run(data):
     global yellow_thress, red_thress
 
     # Tic toc
-    if time.time() - tic > 1:
-        tic = time.time()
+    current_time = time.time()
+    if current_time - tic > 1:
+        tic = current_time
         timer -= 1
         if timer > 0:
             print(timer)
@@ -63,7 +65,7 @@ def run(data):
                 bac = bac_per_ppm * ppm
 
                 bac_graph_points.append(bac)
-                times.append(time.time()-start_time)
+                times.append(current_time-start_time)
 
                 bac_log_short.append(bac)
                 if len(bac_log_short) > short_log_length:
@@ -85,12 +87,20 @@ def run(data):
         print(e)
         pass
 
+    # Forget old data
+    while len(times) > 1 and times[0] < current_time - start_time - look_back_secs:
+        times.pop(0)
+        bac_graph_points.pop(0)
+
     # Plotting stuff
     line.set_data(times, bac_graph_points)
     xmin, xmax = ax.get_xlim()
+    #plt.plot([xmin, xmax], [yellow_thress, yellow_thress], 'y--')
+    #plt.plot([xmin, xmax], [red_thress, red_thress], 'r--')
     if times[-1] >= xmax:
-        ax.set_xlim(xmin, 2*xmax)
+        ax.set_xlim(times[0], times[-1]+5)
         ax.figure.canvas.draw()
+
     return line,
 
 ani = animation.FuncAnimation(fig, run, frames=None, blit=False, interval=10, repeat=False)
