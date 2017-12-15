@@ -25,7 +25,7 @@ bac_log = []
 log_length = 200
 
 timer = 5
-tic = time.time()
+start_time = tic = time.time()
 print(f'Grabbing reference reading in \n{timer}')
 while True:
     # Tic toc
@@ -48,15 +48,18 @@ while True:
 
             if V_o is not None:
                 ppm = np.exp(-14.7*((V_source/V_o - 1)/(V_source/V_sensor - 1) - 0.45))
+                michaels_number = (V_source/V_o - 1)/(V_source/V_sensor - 1)
+                #print(f'michaels_number={michaels_number}')
                 bac = bac_per_ppm * ppm
                 bac_log.append(bac)
                 if len(bac_log) > log_length:
                     bac_log.pop(0)
-                print(f'bac={max(bac_log)}       ', end='\r')
+                display_bac = max(bac_log)
+                print(f'bac={display_bac}       ', end='\r')
 
         elif name == 'tempValueRaw':
             temp_vals.append(int(val))
 
     except Exception as e:
-        print(e)
+        #print(e)
         pass

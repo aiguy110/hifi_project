@@ -17,7 +17,7 @@ class RunData:
             for line in f:
                 temperature = float(line.split(',')[1])
                 self.temperature_data.append(temperature)
-        self.temperature_data = self.temperature_data[::-1] # Waveforms saved the data backwards. Fix that.
+        self.temperature_data = self.temperature_data[::-1] # Waveforms saved the data backwards.
 
     def fit_func(self, n, param_vector=None):
         if param_vector is None:
@@ -46,9 +46,6 @@ class RunData:
 
     def fit(self):
         best_params = minimize(self.get_error, self.get_param_vector()).x
-        # old_error = self.get_error(self.get_param_vector())
-        # new_error = self.get_error(best_params)
-        # print(f'error: {old_error} --> {new_error}')
         self.set_param_vector(best_params)
 
     def plot(self):
@@ -64,9 +61,6 @@ class RunData:
 
 
 
-
-
-
 data_files = ['data/'+fname for fname in os.listdir('data') if fname[-4:] == '.csv']
 runs = []
 for n, fname in enumerate(data_files):
@@ -76,7 +70,6 @@ for n, fname in enumerate(data_files):
 
 run_count = len(runs)
 average_tau = 0
-fig = plt.figure()
 for n, run in enumerate(runs):
     print(f'Processing run {n}')
     run.fit()
