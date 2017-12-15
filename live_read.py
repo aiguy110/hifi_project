@@ -11,7 +11,7 @@ ser = serial.Serial(port)
 gas_vals = []
 temp_vals = []
 
-bac_per_ppm = 0.0003404
+bac_per_ppm = 0.0003404 * 2
 
 V_source = 5
 V_o = None
@@ -22,7 +22,7 @@ V_o = None
 #def animate(i):
 
 bac_log = []
-log_length = 100
+log_length = 200
 
 timer = 5
 tic = time.time()
@@ -49,10 +49,10 @@ while True:
             if V_o is not None:
                 ppm = np.exp(-14.7*((V_source/V_o - 1)/(V_source/V_sensor - 1) - 0.45))
                 bac = bac_per_ppm * ppm
-                # bac_log.append(bac)
-                # if bac_log > log_length:
-                #     bac_log.pop(0)
-                print(f'bac={bac}       ', end='\r')
+                bac_log.append(bac)
+                if len(bac_log) > log_length:
+                    bac_log.pop(0)
+                print(f'bac={max(bac_log)}       ', end='\r')
 
         elif name == 'tempValueRaw':
             temp_vals.append(int(val))
